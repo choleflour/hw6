@@ -5,6 +5,9 @@
 #include <cmath>
 #include <random>
 #include <chrono>
+#include <cctype>
+#include <ctime>
+#include <cstdlib>
 
 typedef std::size_t HASH_INDEX_T;
 
@@ -19,7 +22,33 @@ struct MyStringHash {
     // hash function entry point (i.e. this is h(k))
     HASH_INDEX_T operator()(const std::string& k) const
     {
-        // Add your code here
+        unsigned long long w[5] = {0};
+        int length = k.length();
+        int *digit = new int[length];
+
+        for (int i = 0; i < length; ++i ) {
+            digit[i] = letterDigitToNumber(k[i]);
+        }
+
+        int i = 4 - (length-1)/6;
+        int curr = 1;
+
+        w[i] = digit[0];
+        while (curr < length) {
+            i = 4 - (length-1 - curr)/6;
+            // std::cout <<  i << "    " << w[i] << std::endl;
+            w[i] = w[i] * 36 + digit[curr];
+            ++curr;
+            
+        }
+        
+        delete [] digit;
+
+        // for (int i = 0; i < 5; ++i) {
+        //     std::cout << "w[" << i << "] = " << w[i] << std::endl;
+        // }
+
+        return rValues[0]*w[0] + rValues[1]*w[1] + rValues[2]*w[2] + rValues[3]*w[3] + rValues[4]*w[4];
 
 
     }
@@ -28,7 +57,18 @@ struct MyStringHash {
     HASH_INDEX_T letterDigitToNumber(char letter) const
     {
         // Add code here or delete this helper function if you do not want it
+        // convert upper to lower case
+        if (std::isalpha(letter)) {
+            if (std::isupper(letter)) {
+                letter = std::tolower(letter);
+                // std::cout << letter << std::endl;
+            }
+            return letter - 'a';
 
+        } else {
+            return letter - '0' + 26;
+        }
+        
     }
 
     // Code to generate the random R values
